@@ -1,0 +1,2 @@
+# storeplugin
+netease storeplugin

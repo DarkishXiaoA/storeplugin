@@ -1,0 +1,5 @@
+name: neteasestore
+main: com.github.DarkishXiaoA.neteasestore
+version: 1.1
+commands:
+  storeget:

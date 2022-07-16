@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import wangyifan.neteaselogger.NLAPI;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -78,12 +79,14 @@ public class SendGood implements CommandExecutor {
             if (goodEntities.size()==0){
                 return true;
             }
-            for(GoodEntity tempgood:goodEntities){
-                String cmd = tempgood.getCmd();
-                String orderid = tempgood.getOrderid();
+            for(GoodEntity tempGood:goodEntities){
+                //发货执行指令
+                String cmd = tempGood.getCmd();
+                String orderId = tempGood.getOrderid();
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),cmd.replace("{player}",player.getName()));
-                orderlist.append(orderid).append(",");
+                orderlist.append(orderId).append(",");
                 //System.out.println(goodEntities);
+                NLAPI.addDeliver(player.getName(), orderId, "星际币", orderId, cmd);
             }
             String json = "{\"gameid\": \""+neteasestore.GameId+"\",\"uuid\": \""+uniqueId+"\",\"orderid_list\": ["+orderlist.substring(0,orderlist.length()-1)+"]}";
             //System.out.println(json);

@@ -2,5 +2,5 @@ GameId: 4634459667340054301
 SecretKey: AKKDTbzwRfbavyhl52q90Icj5ZHgHGbi
 GetGoodsUrl: https://x19mclexpr.nie.netease.com:9090/get-mc-item-order-list
 SendGoodUrl: https://x19mclexpr.nie.netease.com:9090/ship-mc-item-order
-EnterMsg: "你好像有物品需要查收/storeget"
-GetMsg: "你没有物品需要签收"
+EnterMsg: "§6§l[商城] §7您好像有星际币需要签收，打开商城签收吧"
+GetMsg: "§6§l[商城] §7您没有星际币需要领取"

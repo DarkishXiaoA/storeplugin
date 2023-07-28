@@ -3,7 +3,6 @@ package com.github.DarkishXiaoA.entity;
 public class GoodEntity {
     private String orderid;
     private String cmd;
-    private String type;
 
     @Override
     public String toString() {

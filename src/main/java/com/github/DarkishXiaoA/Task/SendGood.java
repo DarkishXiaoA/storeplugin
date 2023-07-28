@@ -1,5 +1,7 @@
 package com.github.DarkishXiaoA.Task;
 
+import com.germ.germplugin.api.GermPacketAPI;
+import com.germ.germplugin.api.HudMessageType;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.DarkishXiaoA.entity.GoodEntity;
 import com.github.DarkishXiaoA.neteasestore;
@@ -24,7 +26,7 @@ public class SendGood implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         if (commandSender instanceof Player){
             Player player = (Player) commandSender;
-            UUID uniqueId = player.getUniqueId();
+            UUID uniqueId = ((Player) commandSender).getUniqueId();
             String Json = "{\"gameid\":"+neteasestore.GameId+",\"uuid\":\""+ uniqueId+"\"}";
             //System.out.println(Json);
             String KeyCode = "";
@@ -48,8 +50,9 @@ public class SendGood implements CommandExecutor {
             try{
                 JsonObject jsonObject= (JsonObject) new JsonParser().parse(body);
                 JsonArray entities = jsonObject.getAsJsonArray("entities");
-                ArrayList<GoodEntity> GoodList = new ArrayList<>();
+                ArrayList<GoodEntity> goodList = new ArrayList<>();
                 if (entities.size()==0){
+                    GermPacketAPI.sendHudMessage(player, HudMessageType.LEFT1, neteasestore.GetMsg);
                     //System.out.println("这个玩家啥都没得");
                     return true;
                 }
@@ -57,21 +60,18 @@ public class SendGood implements CommandExecutor {
                     JsonObject tem = (JsonObject) entities.get(i);
                     String orderid = tem.get("orderid").getAsString();
                     String cmd = tem.get("cmd").getAsString();
-                    String type = tem.get("type").getAsString();
-                    String extra = tem.get("extra").getAsString();
-                    System.out.println("类型："+type);
-                    System.out.println("额外："+extra);
                     //System.out.println("单号："+orderid);
                     //System.out.println("命令:"+cmd);
-                    GoodList.add(new GoodEntity(orderid,cmd));
+                    goodList.add(new GoodEntity(orderid,cmd));
                 }
-                commandSender.sendMessage(neteasestore.EnterMsg);
-                neteasestore.PlayerGoodInfo.put(uniqueId,GoodList);
+                GermPacketAPI.sendHudMessage(player, HudMessageType.LEFT1, neteasestore.EnterMsg);
+                neteasestore.PlayerGoodInfo.put(uniqueId,goodList);
             }catch (Exception e){
                 //System.out.println("Json解析错误");
             }
+
             if (!neteasestore.PlayerGoodInfo.containsKey(uniqueId)){
-                player.sendMessage(neteasestore.GetMsg);
+                GermPacketAPI.sendHudMessage(player, HudMessageType.LEFT1, neteasestore.GetMsg);
                 return false;
             }
             StringBuilder orderlist = new StringBuilder();
@@ -86,7 +86,15 @@ public class SendGood implements CommandExecutor {
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),cmd.replace("{player}",player.getName()));
                 orderlist.append(orderId).append(",");
                 //System.out.println(goodEntities);
-                NLAPI.addDeliver(player.getName(), orderId, "星际币", orderId, cmd);
+                try {
+                    String[] arr4 = cmd.split("\\s+");
+                    String points = arr4[arr4.length-1];
+                    NLAPI.addDeliver(player.getName(), orderId, "星际币", orderId, points);
+                    NLAPI.addCurrency(player.getName(), "星际币", points, "充值");
+                    GermPacketAPI.sendHudMessage(player, HudMessageType.LEFT1, "§6§l[商城] §7星际币签收成功 §6+"+points);
+                }catch (Exception ignore){
+                }
+//                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(),"neteaselogger deliver "+player.getName()+" "+orderId+" 星际币 "+orderId+" "+arr4[arr4.length-1]);
             }
             String json = "{\"gameid\": \""+neteasestore.GameId+"\",\"uuid\": \""+uniqueId+"\",\"orderid_list\": ["+orderlist.substring(0,orderlist.length()-1)+"]}";
             //System.out.println(json);
@@ -96,11 +104,11 @@ public class SendGood implements CommandExecutor {
             }catch (Exception e){
                 //System.out.println("加密错误");
             }
-            Map<String,String> Headers= new HashMap<>();
-            Headers.put("content-type","application/json; charset=utf-8");
-            Headers.put("netease-server-sign", KeyCode);
-            Headers.put("cache-control","no-cache");
-            HttpRequest.post(neteasestore.SendGoodUrl).headers(Headers).send(json).body();
+            Map<String,String> headers= new HashMap<>();
+            headers.put("content-type","application/json; charset=utf-8");
+            headers.put("netease-server-sign", KeyCode);
+            headers.put("cache-control","no-cache");
+            HttpRequest.post(neteasestore.SendGoodUrl).headers(headers).send(json).body();
             //System.out.println(body);
             neteasestore.PlayerGoodInfo.remove(uniqueId);
         }

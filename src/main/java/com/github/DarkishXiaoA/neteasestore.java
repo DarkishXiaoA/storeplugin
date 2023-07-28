@@ -36,10 +36,10 @@ public class neteasestore extends JavaPlugin {
         SendGoodUrl = getConfig().getString("SendGoodUrl");
         EnterMsg = getConfig().getString("EnterMsg");
         GetMsg =getConfig().getString("GetMsg");
-        System.out.println("GameId:"+GameId);
-        System.out.println("SecretKey:"+SecretKey);
-        System.out.println("GetGoodsUrl:"+GetGoodsUrl);
-        System.out.println("SendGoodUrl:"+SendGoodUrl);
+//        System.out.println("GameId:"+GameId);
+//        System.out.println("SecretKey:"+SecretKey);
+//        System.out.println("GetGoodsUrl:"+GetGoodsUrl);
+//        System.out.println("SendGoodUrl:"+SendGoodUrl);
         getServer().getMessenger().registerIncomingPluginChannel(this,"storemod", new NeteaseNetWork ());
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "storemod");
         Bukkit.getServer().getPluginManager().registerEvents(new PlayerListener(),this);
